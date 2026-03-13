@@ -23,7 +23,7 @@ class NfcViewModel(application: Application) : AndroidViewModel(application) {
     private val nfcAdapter: NfcAdapter? = NfcAdapter.getDefaultAdapter(getApplication())
 
 
-    var status by mutableStateOf("読み込み準備完了")
+    var status by mutableStateOf("読み取り準備完了\nカードをタッチしてください")
         private set
 
     var history by mutableStateOf(listOf<CardModel>())
@@ -65,14 +65,14 @@ class NfcViewModel(application: Application) : AndroidViewModel(application) {
 
         withContext(Dispatchers.IO) {
             try {
-                val felicaCard = NfcF.get(tag) ?: return@withContext "エラー: このカードはフェリカではありません"
+                val felicaCard = NfcF.get(tag) ?: return@withContext "このカードはフェリカではありません"
                 felicaCard.connect()
                 val idm = felicaCard.tag.id
                 val systemCode = felicaCard.systemCode
                 val isCommonSystem =
                     systemCode.contentEquals(byteArrayOf(0x00.toByte(), 0x03.toByte()))
                 if (!isCommonSystem) {
-                    return@withContext "エラー： このカードは交通系ICカードではありません"
+                    return@withContext "このカードは交通系ICカードではありません"
                 }
 
                 //make response
@@ -91,10 +91,14 @@ class NfcViewModel(application: Application) : AndroidViewModel(application) {
                 felicaCard.close()
 
             } catch (e: Exception) {
-                return@withContext "エラー: ${e.message}\n"
+                return@withContext "例外: ${e.message}\n"
             }
 
         }
-        return "読み込み成功"
+        if (history.isNotEmpty()) {
+            return "読み込み成功"
+        }else{
+            return "カードとの接続が切断されました\nもう一度やり直してください"
+        }
     }
 }
