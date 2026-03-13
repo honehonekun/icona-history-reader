@@ -46,9 +46,6 @@ import kotlin.math.abs
 class MainActivity : ComponentActivity() {
     private lateinit var nfcViewModel: NfcViewModel
     private lateinit var pendingIntent: PendingIntent
-
-
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         nfcViewModel = ViewModelProvider(this).get(NfcViewModel::class.java)
@@ -66,34 +63,8 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            NfcReaderTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(), topBar = {
-                        TopAppBar(
-                            title = {
-                                Column {
-                                    Text("交通系ICリーダー")
-                                    Spacer(Modifier.height(4.dp))
-                                    Text(
-                                        nfcViewModel.status,
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                }
-                            }
-                        )
-                    }
-                ) {
-                    NfcScreen(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(it),
-                        status = nfcViewModel.status,
-                        list = nfcViewModel.history
-                    )
-                }
-            }
+            NfcApp(nfcViewModel = nfcViewModel)
         }
-
     }
 
     override fun onResume() {
@@ -106,7 +77,6 @@ class MainActivity : ComponentActivity() {
         nfcViewModel.disableForegroundDispatch(this)
     }
 
-
     //待機してインテントが発生したら実行　（アプリ実行時用）
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -117,6 +87,43 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+fun NfcApp(modifier: Modifier = Modifier, nfcViewModel: NfcViewModel) {
+    NfcReaderTheme {
+        Scaffold(
+            modifier = modifier.fillMaxSize(), topBar = {
+                NfcTopAppBar(nfcViewModel = nfcViewModel)
+            }
+        ) {
+            NfcScreen(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it),
+                status = nfcViewModel.status,
+                list = nfcViewModel.history
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NfcTopAppBar(modifier: Modifier = Modifier, nfcViewModel: NfcViewModel) {
+    TopAppBar(
+        title = {
+            Column {
+                Text("交通系ICリーダー")
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    nfcViewModel.status,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }, modifier = modifier
+    )
+}
+
+
+@Composable
 fun NfcScreen(modifier: Modifier = Modifier, status: String, list: List<CardModel>) {
     Column(
         modifier = modifier,
@@ -125,7 +132,11 @@ fun NfcScreen(modifier: Modifier = Modifier, status: String, list: List<CardMode
     ) {
 
 
-        OutlinedCard(modifier = Modifier.padding(32.dp), elevation = CardDefaults.cardElevation(8.dp), shape = RoundedCornerShape(20.dp)) {
+        OutlinedCard(
+            modifier = Modifier.padding(32.dp),
+            elevation = CardDefaults.cardElevation(8.dp),
+            shape = RoundedCornerShape(20.dp)
+        ) {
             Box() {
 
                 Image(
@@ -145,7 +156,7 @@ fun NfcScreen(modifier: Modifier = Modifier, status: String, list: List<CardMode
             text = if (list.isNotEmpty()) {
                 "残高:￥${list[0].credit}"
             } else {
-                "残高がここに表示されます"
+                "残高がここに表示されます\nカードをタッチしてください"
             }, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(16.dp))
@@ -161,7 +172,7 @@ fun NfcScreen(modifier: Modifier = Modifier, status: String, list: List<CardMode
 
                 val subCredit = item.credit - list[index + 1].credit
 
-                Card (
+                Card(
                     Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
                     shape = RoundedCornerShape(4.dp),
                     colors = CardDefaults.cardColors()
@@ -194,7 +205,7 @@ fun NfcScreen(modifier: Modifier = Modifier, status: String, list: List<CardMode
                             style = MaterialTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Bold,
                             color = if (subCredit <= 0) {
-                               colorResource(R.color.orange)
+                                colorResource(R.color.orange)
                             } else {
                                 colorResource(R.color.blue)
                             }
