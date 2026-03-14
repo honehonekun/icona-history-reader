@@ -1,6 +1,7 @@
 
-<img src="https://github.com/user-attachments/assets/462e7883-77ff-45f2-baae-f66b2784ea6c" width="200">
-<img src="https://github.com/user-attachments/assets/acf8cbb3-fb6e-4204-bf1b-3127a0c437c8" width="200">  
+<img src="https://github.com/user-attachments/assets/aa48df58-f1e4-4e7d-9df9-2f25f576b705" width="200">
+<img src="https://github.com/user-attachments/assets/0f0bc6f7-5e5a-4f23-ae24-8c0514397d50" width="200">
+<img src="https://github.com/user-attachments/assets/fd0c74e1-49cf-41f6-8c3f-fdc8366a992b" width="200">  
 
 # 使い方
 - リリースからapkを入手してください
